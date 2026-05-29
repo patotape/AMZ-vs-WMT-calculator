@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Walmart vs Amazon — Family Savings Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f2eb;
+    --bg-card: #ffffff;
+    --bg-alt: #edeae1;
+    --text: #1a1814;
+    --text-muted: #6b6760;
+    --text-faint: #a09d97;
+    --border: #d4d0c8;
+    --walmart-blue: #0071dc;
+    --walmart-light: #e8f3ff;
+    --walmart-dark: #004f9a;
+    --amazon-orange: #e07b00;
+    --amazon-light: #fff4e0;
+    --amazon-dark: #995500;
+    --green: #1a7a4a;
+    --green-light: #e2f4eb;
+    --accent: #c85a1e;
+    --radius: 12px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  header {
+    background: var(--text);
+    color: #f5f2eb;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+  }
+
+  header .eyebrow {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #a09d97;
+    margin-bottom: 0.75rem;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  header h1 span.w { color: #5aaff5; }
+  header h1 span.a { color: #f5a623; }
+
+  header p {
+    font-size: 15px;
+    color: #a09d97;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .income-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 4px 14px;
+    border-radius: 999px;
+    margin-bottom: 1.25rem;
+  }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  .field input, .field select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--text);
+    background: #fff;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--text);
+    color: #f5f2eb;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 13px 28px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-top: 1.25rem;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn:hover { background: #333; }
+  .btn:active { transform: scale(0.98); }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 1.25rem;
+    margin-left: 10px;
+  }
+
+  .share-btn:hover { background: var(--bg-alt); }
+
+  #results { display: none; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+
+  .metric {
+    background: var(--bg-alt);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.125rem;
+  }
+
+  .metric-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .metric-value { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
+  .metric-sub { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+  .metric-value.green { color: var(--green); }
+
+  .stores-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (max-width: 520px) { .stores-grid { grid-template-columns: 1fr; } }
+
+  .store-card {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    background: var(--bg-card);
+    transition: border-color 0.2s;
+  }
+
+  .store-card.winner-walmart { border-color: var(--walmart-blue); background: var(--walmart-light); }
+  .store-card.winner-amazon  { border-color: var(--amazon-orange); background: var(--amazon-light); }
+
+  .store-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .store-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .store-name.w { color: var(--walmart-dark); }
+  .store-name.a { color: var(--amazon-dark); }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-winner-w { background: var(--walmart-blue); color: #fff; }
+  .badge-winner-a { background: var(--amazon-orange); color: #fff; }
+  .badge-alt { background: var(--bg-alt); color: var(--text-muted); }
+
+  .cost-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    color: var(--text-muted);
+  }
+
+  .cost-line:last-child { border-bottom: none; }
+  .cost-line span:last-child { font-weight: 500; color: var(--text); }
+
+  .store-total {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding-top: 10px;
+    margin-top: 6px;
+    border-top: 1.5px solid rgba(0,0,0,0.1);
+  }
+
+  .savings-banner {
+    background: var(--green-light);
+    border: 1px solid #a3d9bc;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--green);
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+  }
+
+  .savings-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .cat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .cat-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-faint);
+    font-weight: 500;
+    padding: 0 8px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cat-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--bg-alt);
+    color: var(--text);
+  }
+
+  .cat-table tr:last-child td { border-bottom: none; }
+  .win-w { color: var(--walmart-dark); font-weight: 600; }
+  .win-a { color: var(--amazon-dark); font-weight: 600; }
+
+  .note {
+    font-size: 12px;
+    color: var(--text-faint);
+    line-height: 1.7;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+  }
+
+  .hybrid-tips {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 0.5rem;
+  }
+
+  .tip {
+    background: var(--bg-alt);
+    border-radius: var(--radius-sm);
+    padding: 0.875rem 1rem;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .tip strong { display: block; font-family: 'Syne', sans-serif; font-size: 12px; letter-spacing: 0.06em; margin-bottom: 4px; color: var(--text); }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--text-faint);
+    border-top: 1px solid var(--border);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--text);
+    color: #f5f2eb;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    z-index: 999;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Family Budget Tool · $50,000/year income</div>
+  <div class="income-tag">2024 · U.S. Households</div>
+  <h1><span class="w">Walmart</span> vs <span class="a">Amazon</span><br>Which saves your family more?</h1>
+  <p>Enter your zip code to get a personalized cost comparison based on your region's cost of living.</p>
+</header>
+
+<main>
+  <div class="card">
+    <div class="card-title">Your household</div>
+    <div class="input-grid">
+      <div class="field">
+        <label for="zip">Zip code</label>
+        <input type="text" id="zip" placeholder="e.g. 90210" maxlength="5" />
+      </div>
+      <div class="field">
+        <label for="household">Household size</label>
+        <select id="household">
+          <option value="2">2 people</option>
+          <option value="3">3 people</option>
+          <option value="4" selected>4 people (family)</option>
+          <option value="5">5 people</option>
+          <option value="6">6 people</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="style">Shopping focus</label>
+        <select id="style">
+          <option value="balanced" selected>Balanced mix</option>
+          <option value="groceries">Grocery-heavy</option>
+          <option value="general">General merchandise</option>
+          <option value="tech">Electronics / tech</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="calculate()">Calculate my savings →</button>
+    <button class="share-btn" onclick="shareResults()" id="share-btn" style="display:none;">⬆ Share results</button>
+  </div>
+
+  <div id="results">
+    <div class="card">
+      <div class="card-title">Summary</div>
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="metric-label">Annual income</div>
+          <div class="metric-value">$50,000</div>
+          <div class="metric-sub">Moderate budget tier</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Best annual spend</div>
+          <div class="metric-value" id="m-spend">—</div>
+          <div class="metric-sub" id="m-pct">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Potential savings</div>
+          <div class="metric-value green" id="m-savings">—</div>
+          <div class="metric-sub" id="m-monthly">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Top pick</div>
+          <div class="metric-value" id="m-winner" style="font-size:18px;">—</div>
+          <div class="metric-sub" id="m-region">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stores-grid">
+      <div class="store-card" id="wcard">
+        <div class="store-header">
+          <div class="store-name w">Walmart</div>
+          <div class="badge" id="wbadge"></div>
+        </div>
+        <div id="wcosts"></div>
+        <div class="store-total"><span>Annual total</span><span id="wtotal"></span></div>
+      </div>
+      <div class="store-card" id="acard">
+        <div class="store-header">
+          <div class="store-name a">Amazon</div>
+          <div class="badge" id="abadge"></div>
+        </div>
+        <div id="acosts"></div>
+        <div class="store-total"><span>Annual total</span><span id="atotal"></span></div>
+      </div>
+    </div>
+
+    <div class="savings-banner" id="banner">
+      <div class="savings-icon">🐷</div>
+      <div id="banner-text"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Category breakdown</div>
+      <table class="cat-table">
+        <thead><tr><th>Category</th><th>Walmart</th><th>Amazon</th><th>Better deal</th></tr></thead>
+        <tbody id="cat-body"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Hybrid strategy — shop both smartly</div>
+      <div class="hybrid-tips" id="hybrid-tips"></div>
+    </div>
+
+    <div class="card">
+      <div class="note" id="footnote"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Built for U.S. families earning ~$50,000/year · Estimates based on BLS Consumer Expenditure Survey data · Not affiliated with Walmart or Amazon
+</footer>
+
+<div class="toast" id="toast">Link copied to clipboard!</div>
+
+<script>
+const STATE_REGION = {
+  "0":{"name":"New England","col":1.28},
+  "1":{"name":"New York / Mid-Atlantic","col":1.25},
+  "2":{"name":"Mid-Atlantic / Southeast","col":1.10},
+  "3":{"name":"Southeast","col":0.94},
+  "4":{"name":"Midwest","col":0.92},
+  "5":{"name":"Great Lakes / Plains","col":0.93},
+  "6":{"name":"South Central","col":0.91},
+  "7":{"name":"South / Texas","col":0.90},
+  "8":{"name":"Mountain / Southwest","col":1.02},
+  "9":{"name":"Pacific Coast","col":1.30}
+};
+
+const BASE_SPEND = {
+  2:{groceries:3800,household:800,clothing:600,electronics:400,misc:500},
+  3:{groceries:5200,household:1000,clothing:900,electronics:500,misc:700},
+  4:{groceries:6800,household:1200,clothing:1200,electronics:600,misc:900},
+  5:{groceries:8200,household:1400,clothing:1500,electronics:700,misc:1100},
+  6:{groceries:9400,household:1600,clothing:1800,electronics:800,misc:1300}
+};
+
+const STYLE_MULT = {
+  balanced:{groceries:1.0,household:1.0,clothing:1.0,electronics:1.0,misc:1.0},
+  groceries:{groceries:1.4,household:0.8,clothing:0.7,electronics:0.6,misc:0.8},
+  general:{groceries:0.8,household:1.3,clothing:1.3,electronics:1.1,misc:1.2},
+  tech:{groceries:0.8,household:0.9,clothing:0.8,electronics:2.0,misc:1.0}
+};
+
+const WD = {groceries:0.88,household:0.87,clothing:0.89,electronics:0.93,misc:0.90};
+const AD = {groceries:0.92,household:0.85,clothing:0.91,electronics:0.88,misc:0.87};
+
+const CAT_LABELS = {groceries:"Groceries & food",household:"Home & cleaning",clothing:"Clothing & apparel",electronics:"Electronics",misc:"Personal care & misc"};
+
+const HYBRID_TIPS = [
+  {title:"Groceries → Walmart",text:"Fresh produce, dairy, and pantry staples are consistently cheaper at Walmart, especially in the South and Midwest."},
+  {title:"Electronics → Amazon",text:"Amazon's competitive pricing on tech, plus easy returns and reviews, often beats Walmart — especially on brand-name items."},
+  {title:"Bulk household goods → Walmart+",text:"Cleaning products, paper goods, and laundry supplies are best bought in bulk at Walmart, often 10–15% cheaper."},
+  {title:"Specialty & niche items → Amazon",text:"Hard-to-find items, specific brands, or niche products are almost always available and competitively priced on Amazon."},
+];
+
+function fmt(n){return '$'+Math.round(n).toLocaleString();}
+
+function calculate(){
+  const zip=document.getElementById('zip').value.trim();
+  const hh=parseInt(document.getElementById('household').value);
+  const style=document.getElementById('style').value;
+  if(!/^\d{5}$/.test(zip)){alert('Please enter a valid 5-digit zip code.');return;}
+
+  const region=STATE_REGION[zip.charAt(0)]||STATE_REGION["5"];
+  const col=region.col;
+  const base=BASE_SPEND[hh];
+  const sm=STYLE_MULT[style];
+  const cats=['groceries','household','clothing','electronics','misc'];
+
+  let wT=0,aT=0;
+  const catRows=[];
+
+  cats.forEach(c=>{
+    const spend=base[c]*sm[c]*col;
+    const w=spend*WD[c], a=spend*AD[c];
+    wT+=w; aT+=a;
+    catRows.push({label:CAT_LABELS[c],w,a});
+  });
+
+  const wFinal=wT+98, aFinal=aT+139;
+  const savings=Math.abs(wFinal-aFinal);
+  const winner=wFinal<=aFinal?'Walmart':'Amazon';
+  const pct=((Math.min(wFinal,aFinal)/50000)*100).toFixed(1);
+
+  document.getElementById('m-spend').textContent=fmt(Math.min(wFinal,aFinal));
+  document.getElementById('m-pct').textContent=pct+'% of annual income';
+  document.getElementById('m-savings').textContent=fmt(savings)+'/yr';
+  document.getElementById('m-monthly').textContent=fmt(savings/12)+' per month';
+  document.getElementById('m-winner').textContent=winner;
+  document.getElementById('m-region').textContent=region.name;
+
+  document.getElementById('wcard').className='store-card'+(winner==='Walmart'?' winner-walmart':'');
+  document.getElementById('acard').className='store-card'+(winner==='Amazon'?' winner-amazon':'');
+
+  document.getElementById('wbadge').className='badge '+(winner==='Walmart'?'badge-winner-w':'badge-alt');
+  document.getElementById('wbadge').textContent=winner==='Walmart'?'Best value ✓':'Alternative';
+  document.getElementById('abadge').className='badge '+(winner==='Amazon'?'badge-winner-a':'badge-alt');
+  document.getElementById('abadge').textContent=winner==='Amazon'?'Best value ✓':'Alternative';
+
+  const costHtml=(rows,disc)=>rows.map(r=>`<div class="cost-line"><span>${r.label}</span><span>${fmt(r.w*disc/disc)}</span></div>`).join('');
+
+  document.getElementById('wcosts').innerHTML=catRows.map(r=>`<div class="cost-line"><span>${r.label}</span><span>${fmt(r.w)}</span></div>`).join('')+
+    `<div class="cost-line"><span>Walmart+ membership</span><span>${fmt(98)}</span></div>`;
+  document.getElementById('acosts').innerHTML=catRows.map(r=>`<div class="cost-line"><span>${r.label}</span><span>${fmt(r.a)}</span></div>`).join('')+
+    `<div class="cost-line"><span>Prime membership</span><span>${fmt(139)}</span></div>`;
+
+  document.getElementById('wtotal').textContent=fmt(wFinal);
+  document.getElementById('atotal').textContent=fmt(aFinal);
+
+  document.getElementById('banner-text').innerHTML=`Choosing <strong>${winner}</strong> as your primary store could save this family approximately <strong>${fmt(savings)}/year</strong> — that's <strong>${fmt(savings/12)}/month</strong> freed up in your budget.`;
+
+  const catHtml=catRows.map(r=>{
+    const wWin=r.w<=r.a;
+    return`<tr><td>${r.label}</td><td class="${wWin?'win-w':''}">${fmt(r.w)}</td><td class="${!wWin?'win-a':''}">${fmt(r.a)}</td><td>${wWin?'<span class="win-w">Walmart</span>':'<span class="win-a">Amazon</span>'}</td></tr>`;
+  }).join('');
+  document.getElementById('cat-body').innerHTML=catHtml;
+
+  document.getElementById('hybrid-tips').innerHTML=HYBRID_TIPS.map(t=>`<div class="tip"><strong>${t.title}</strong>${t.text}</div>`).join('');
+
+  document.getElementById('footnote').innerHTML=`<strong>Region detected:</strong> ${region.name} (zip: ${zip}) &nbsp;·&nbsp; Cost-of-living index: ${col.toFixed(2)}x national average<br>Estimates based on BLS Consumer Expenditure Survey data scaled to a $50,000/year household. Actual prices vary by location, promotions, and membership status. Walmart+ ($98/yr) and Amazon Prime ($139/yr) membership costs included. This tool is for informational purposes only.`;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('share-btn').style.display='inline-flex';
+
+  const url=new URL(window.location.href);
+  url.searchParams.set('zip',zip);
+  url.searchParams.set('hh',hh);
+  url.searchParams.set('style',style);
+  window.history.replaceState({},'',url);
+
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function shareResults(){
+  navigator.clipboard.writeText(window.location.href).then(()=>{
+    const t=document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
+  });
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('zip')){
+    document.getElementById('zip').value=p.get('zip');
+    if(p.get('hh'))document.getElementById('household').value=p.get('hh');
+    if(p.get('style'))document.getElementById('style').value=p.get('style');
+    calculate();
+  }
+});
+
+document.getElementById('zip').addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+</script>
+</body>
+</html>
